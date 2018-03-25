@@ -3,6 +3,6 @@
 ##### How to run this project:
 
 *	 clone this repo
-*	 cd to the project folder
+*	 `cd` to the project folder
 *  	 `npm install`
 *	 `node index.js`
