@@ -10,7 +10,7 @@ const pathAccessible = path => {
     try {
         fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK)
         accessible = true
-    } catch {
+    } catch (err) {
         console.error(`Access Directory ${path} Failed`)
     }
     return accessible
@@ -54,10 +54,10 @@ function getHtml(url) {
                 
         }
     })
-    console.log('\n-----STRAT DOWNLOAD-----\n')
-    console.log('-FILENAME: ' + filename + '\n')
+    await console.log('\n-----STRAT DOWNLOAD-----\n')
+    await console.log('-FILENAME: ' + filename + '\n')
     await request(uri).pipe(fs.createWriteStream('./image/' + filename))
-    console.log('-----ENDED DOWNLOAD-----\n')   
+    await console.log('-----ENDED DOWNLOAD-----\n')   
 }
 
 async function getData () {
@@ -66,7 +66,7 @@ async function getData () {
     arr.forEach(ele => {
         let uri = 'http://img.hb.aicdn.com/' + ele.match(/(\w+-\w+)/)[1]
         let filename = ele.match(/(\w+-\w+)/)[1] + '.jpeg'
-        await writeFile(uri, filename)
+        writeFile(uri, filename)
     })
 }
 
