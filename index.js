@@ -22,7 +22,7 @@ function getHtml(url) {
     })
 }
 
-function writeFile(uri, filename) {    
+ async function writeFile(uri, filename) {    
     request.head(uri, (err, res, body) => {
         if (err) {
                 
@@ -30,7 +30,7 @@ function writeFile(uri, filename) {
     })
     console.log('\n-----STRAT DOWNLOAD-----\n')
     console.log('-FILENAME: ' + filename + '\n')
-    request(uri).pipe(fs.createWriteStream('./image/' + filename))
+    await request(uri).pipe(fs.createWriteStream('./image/' + filename))
     console.log('-----ENDED DOWNLOAD-----\n')   
 }
 
