@@ -5,6 +5,32 @@ const request = require('request')
 
 const requestUrl = 'http://huaban.com/favorite/beauty/?jf5ga5b7&max=1567407240&limit=100&wfl=1'
 
+const pathAccessible = path => {
+    let accessible = false
+    try {
+        fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK)
+        accessible = true
+    } catch {
+        console.error(`Access Directory ${path} Failed`)
+    }
+    return accessible
+}
+
+const pathExists = path => fs.existsSync(path)
+
+const checkPathPermissions = path => {
+    if (pathExists(path) && pathAccessible(path)) {
+        return
+    } 
+    if (!pathExists(path) && pathAccessible('.')) {
+        fs.mkdirSync(path)
+        return
+    }
+    if (!pathAccessible('.') || !pathAccessible(path)) {
+        process.exit(1)
+    }
+}
+
 function getHtml(url) {
     return new Promise((resolve, reject) => {
         http.get(url, res => {
@@ -40,8 +66,9 @@ async function getData () {
     arr.forEach(ele => {
         let uri = 'http://img.hb.aicdn.com/' + ele.match(/(\w+-\w+)/)[1]
         let filename = ele.match(/(\w+-\w+)/)[1] + '.jpeg'
-        writeFile(uri, filename)
+        await writeFile(uri, filename)
     })
 }
 
+checkPathPermissions('./image')
 getData()
