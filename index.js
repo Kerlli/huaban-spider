@@ -2,8 +2,35 @@ const http = require('http')
 const fs = require('fs')
 const Promise = require('promise')
 const request = require('request')
+const rp = require('request-promise')
+const cheerio = require('cheerio')
+const crawlPicCount = 5
 
-const requestUrl = 'http://huaban.com/favorite/beauty/?jf5ga5b7&max=1567407240&limit=100&wfl=1'
+const requestUrl = 'http://huaban.com/favorite/beauty/?jf5ga5b7&max=1567407240&wfl=1&limit=100'
+
+const options = {
+    uri: `http://huaban.com/favorite/beauty/?jf5ga5b7&max=1567407240&wfl=1&limit=${crawlPicCount}`,
+    transform: function (body) {
+        return cheerio.load(body)
+    }
+}
+
+const sliceString = (string, charHead, charTail) => 
+    string.slice(
+        string.indexOf(charHead) + charHead.length || 0
+        , string.indexOf(charTail) || string.length - 1
+    )
+
+rp(options)
+    .then($ => {
+        //process html to picUrls
+        let { data } = $('script').contents()[7]
+        let obj = JSON.parse(sliceString(data, 'app.page["pins"] = ', ';\napp.page["ads"]'))
+        let picUrls = obj.map(picInfo => `http://img.hb.aicdn.com/${picInfo.file.key}_/fw/480`)
+    })
+    .catch(err => {
+        //Crawling failed or Cheerio choked
+    })
 
 const pathAccessible = path => {
     let accessible = false
@@ -31,6 +58,10 @@ const checkPathPermissions = path => {
     }
 }
 
+/*
+    getHtml(url) will be removed
+*/
+
 function getHtml(url) {
     return new Promise((resolve, reject) => {
         http.get(url, res => {
@@ -48,16 +79,24 @@ function getHtml(url) {
     })
 }
 
+/*
+    wirteFile() will be rewrited
+*/
+
  async function writeFile(uri, filename) {    
     request.head(uri, (err, res, body) => {
         if (err) {
                 
         }
     })
-    await console.log('\n-----STRAT DOWNLOAD-----\n')
-    await console.log('-FILENAME: ' + filename + '\n')
+    console.log('\n-----STRAT DOWNLOAD-----\n')
+    console.log('-FILENAME: ' + filename + '\n')
     await request(uri).pipe(fs.createWriteStream('./image/' + filename))
-    await console.log('-----ENDED DOWNLOAD-----\n')   
+    console.log('-----ENDED DOWNLOAD-----\n')   
+}
+
+async function writeFile (filename) {
+
 }
 
 async function getData () {
@@ -70,5 +109,5 @@ async function getData () {
     })
 }
 
-checkPathPermissions('./image')
-getData()
+// checkPathPermissions('./image')
+// getData()
