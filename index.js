@@ -1,7 +1,6 @@
-const http = require('http')
 const fs = require('fs')
+const download = require('download')
 const Promise = require('promise')
-const request = require('request')
 const rp = require('request-promise')
 const cheerio = require('cheerio')
 const crawlPicCount = 5
@@ -28,23 +27,14 @@ const sliceString = (string, charHead, charTail) =>
 const getPicIdQueueInfo = responseJSON => {
     return {
         firstId: responseJSON[0].pin_id,
-        lastId: responseJSON.getLast().pin_id,
+        lastId: responseJSON[responseJSON.length - 1].pin_id,
         count: responseJSON.length,
         picUrls: responseJSON
-            .map(picInfo => `http://img.hb.aicdn.com/${picInfo.file.key}_/fw/480`)
+            .map(picInfo => `http://img.hb.aicdn.com/${picInfo.file.key}_/fw/480`),
+        filenames: responseJSON
+            .map(picInfo => `${picInfo.file.key}.jpg`)
     }
 }
-
-rp(options)
-    .then($ => {
-        //process html to picUrls
-        let { data } = $('script').contents()[7]
-        let responseJSON = JSON.parse(sliceString(data, 'app.page["pins"] = ', ';\napp.page["ads"]'))
-        let { firstId, lastId, count, picUrls } = getPicIdQueueInfo(responseJSON)
-    })
-    .catch(err => {
-        //Crawling failed or Cheerio choked
-    })
 
 const pathAccessible = path => {
     let accessible = false
@@ -73,45 +63,39 @@ const checkPathPermissions = path => {
 }
 
 /*
-    getHtml(url) will be removed
-*/
-
-function getHtml(url) {
-    return new Promise((resolve, reject) => {
-        http.get(url, res => {
-            let html = ''
-            res.setEncoding('utf-8')
-            res.on('data', chunk => {
-                html += chunk
-            })
-            res.on('end', () => {
-                resolve(html)
-            })
-        }).on('error', e => {
-            reject(e)
-        })
-    })
-}
-
-/*
     wirteFile() will be rewrited
 */
 
- async function writeFile(uri, filename) {    
-    request.head(uri, (err, res, body) => {
-        if (err) {
+//  async function writeFile(uri, filename) {    
+//     request.head(uri, (err, res, body) => {
+//         if (err) {
                 
-        }
+//         }
+//     })
+//     console.log('\n-----STRAT DOWNLOAD-----\n')
+//     console.log('-FILENAME: ' + filename + '\n')
+//     await request(uri).pipe(fs.createWriteStream('./image/' + filename))
+//     console.log('-----ENDED DOWNLOAD-----\n')   
+// }
+
+function downloadFile (urlQueue, distPath, filenameQueue) {
+    Promise.all(urlQueue.map((f, i) => download(f, distPath, { filename: filenameQueue[i] }))).then(r => {
+        console.log(r)
     })
-    console.log('\n-----STRAT DOWNLOAD-----\n')
-    console.log('-FILENAME: ' + filename + '\n')
-    await request(uri).pipe(fs.createWriteStream('./image/' + filename))
-    console.log('-----ENDED DOWNLOAD-----\n')   
 }
 
-async function writeFile (filename) {
-
-}
+rp(options)
+    .then($ => {
+        //process html to picUrls
+        let { data } = $('script').contents()[7]
+        let responseJSON = JSON.parse(sliceString(data, 'app.page["pins"] = ', ';\napp.page["ads"]'))
+        let { firstId, lastId, count, picUrls, filenames } = getPicIdQueueInfo(responseJSON)
+        checkPathPermissions('./image')
+        downloadFile(picUrls, './image', filenames)
+    })
+    .catch(err => {
+        //Crawling failed or Cheerio choked
+    })
 
 async function getData () {
     let html = await getHtml(requestUrl)
@@ -123,5 +107,4 @@ async function getData () {
     })
 }
 
-// checkPathPermissions('./image')
 // getData()
