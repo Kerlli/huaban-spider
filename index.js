@@ -6,10 +6,14 @@ const rp = require('request-promise')
 const cheerio = require('cheerio')
 const crawlPicCount = 5
 
-const requestUrl = 'http://huaban.com/favorite/beauty/?jf5ga5b7&max=1567407240&wfl=1&limit=100'
+const requestUrl = 'http://huaban.com/favorite/beauty/'
+/*
+    首次请求用 http://huaban.com/favorite/beauty/
+    之后使用 http://huaban.com/favorite/beauty/?max=${下个队列的首个pin_id}&wfl=1&limit=${一次要抓取的数量}
+*/
 
 const options = {
-    uri: `http://huaban.com/favorite/beauty/?jf5ga5b7&max=1567407240&wfl=1&limit=${crawlPicCount}`,
+    uri: `http://huaban.com/favorite/beauty/`,
     transform: function (body) {
         return cheerio.load(body)
     }
@@ -21,12 +25,22 @@ const sliceString = (string, charHead, charTail) =>
         , string.indexOf(charTail) || string.length - 1
     )
 
+const getPicIdQueueInfo = responseJSON => {
+    return {
+        firstId: responseJSON[0].pin_id,
+        lastId: responseJSON.getLast().pin_id,
+        count: responseJSON.length,
+        picUrls: responseJSON
+            .map(picInfo => `http://img.hb.aicdn.com/${picInfo.file.key}_/fw/480`)
+    }
+}
+
 rp(options)
     .then($ => {
         //process html to picUrls
         let { data } = $('script').contents()[7]
-        let obj = JSON.parse(sliceString(data, 'app.page["pins"] = ', ';\napp.page["ads"]'))
-        let picUrls = obj.map(picInfo => `http://img.hb.aicdn.com/${picInfo.file.key}_/fw/480`)
+        let responseJSON = JSON.parse(sliceString(data, 'app.page["pins"] = ', ';\napp.page["ads"]'))
+        let { firstId, lastId, count, picUrls } = getPicIdQueueInfo(responseJSON)
     })
     .catch(err => {
         //Crawling failed or Cheerio choked
