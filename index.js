@@ -1,9 +1,8 @@
 const fs = require('fs')
-const download = require('download')
-const Promise = require('promise')
 const rp = require('request-promise')
 const { config } = require('./modules/config')
 const { processResponse } = require('./modules/processResponse')
+const { downloadFile } = require('./modules/downloadFile')
 
 const { requestPromiseOptions, crawlPicCount, distFolderName } = config
 
@@ -37,12 +36,6 @@ const checkPathPermissions = path => {
     if (!pathAccessible('.') || !pathAccessible(path)) {
         process.exit(1)
     }
-}
-
-function downloadFile (urlQueue, distPath, filenameQueue) {
-    Promise.all(urlQueue.map((f, i) => download(f, distPath, { filename: filenameQueue[i] }))).then(r => {
-        console.log(r)
-    })
 }
 
 rp(requestPromiseOptions)
