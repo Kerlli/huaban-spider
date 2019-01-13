@@ -62,22 +62,6 @@ const checkPathPermissions = path => {
     }
 }
 
-/*
-    wirteFile() will be rewrited
-*/
-
-//  async function writeFile(uri, filename) {    
-//     request.head(uri, (err, res, body) => {
-//         if (err) {
-                
-//         }
-//     })
-//     console.log('\n-----STRAT DOWNLOAD-----\n')
-//     console.log('-FILENAME: ' + filename + '\n')
-//     await request(uri).pipe(fs.createWriteStream('./image/' + filename))
-//     console.log('-----ENDED DOWNLOAD-----\n')   
-// }
-
 function downloadFile (urlQueue, distPath, filenameQueue) {
     Promise.all(urlQueue.map((f, i) => download(f, distPath, { filename: filenameQueue[i] }))).then(r => {
         console.log(r)
@@ -96,15 +80,3 @@ rp(options)
     .catch(err => {
         //Crawling failed or Cheerio choked
     })
-
-async function getData () {
-    let html = await getHtml(requestUrl)
-    let arr = html.match(/"key":"(\w+-\w+)",\s"type":"image\/jpeg"/g).concat()
-    arr.forEach(ele => {
-        let uri = 'http://img.hb.aicdn.com/' + ele.match(/(\w+-\w+)/)[1]
-        let filename = ele.match(/(\w+-\w+)/)[1] + '.jpeg'
-        writeFile(uri, filename)
-    })
-}
-
-// getData()
