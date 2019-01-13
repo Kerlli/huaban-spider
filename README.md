@@ -2,10 +2,12 @@
 
 ##### How to run this project:
 
-*	 clone this repo
-*	 `cd` to the project folder
-*  	 `npm install`
-*	 `node index.js`
+```shell
+  $ git clone https://github.com/Kerlli/huaban-spider.git
+  $ cd huaban-spider
+  $ npm install
+  $ npm start
+```
 
 ###### ToDo:
 
