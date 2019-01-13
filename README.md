@@ -2,7 +2,7 @@
 
 ##### Screenshot:
 
-![image](http://github.com/Kerlli/huaban-spider/master/Screenshot/1.png)
+![image](https://raw.githubusercontent.com/Kerlli/huaban-spider/master/Screenshot/1.png)
 
 ##### How to run this project:
 
