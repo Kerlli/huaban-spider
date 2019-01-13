@@ -1,6 +1,6 @@
-const fs = require('fs')
 const rp = require('request-promise')
 const { config } = require('./modules/config')
+const { checkAndMkdirIfNeeded } = require('./modules/checkAndMkdirIfNeeded')
 const { processResponse } = require('./modules/processResponse')
 const { downloadFile } = require('./modules/downloadFile')
 
@@ -12,37 +12,11 @@ const { requestPromiseOptions, crawlPicCount, distFolderName } = config
     之后使用 http://huaban.com/favorite/beauty/?max=${下个队列的首个pin_id}&wfl=1&limit=${一次要抓取的数量}
 */
 
-const pathAccessible = path => {
-    let accessible = false
-    try {
-        fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK)
-        accessible = true
-    } catch (err) {
-        console.error(`Access Directory ${path} Failed`)
-    }
-    return accessible
-}
-
-const pathExists = path => fs.existsSync(path)
-
-const checkPathPermissions = path => {
-    if (pathExists(path) && pathAccessible(path)) {
-        return
-    } 
-    if (!pathExists(path) && pathAccessible('.')) {
-        fs.mkdirSync(path)
-        return
-    }
-    if (!pathAccessible('.') || !pathAccessible(path)) {
-        process.exit(1)
-    }
-}
-
 rp(requestPromiseOptions)
     .then($ => {
         //process html to picUrls
         let { firstId, lastId, count, picUrls, filenames } = processResponse($('script').contents()[7])
-        checkPathPermissions(distFolderName)
+        checkAndMkdirIfNeeded(distFolderName)
         downloadFile(picUrls, distFolderName, filenames)
     })
     .catch(err => {
