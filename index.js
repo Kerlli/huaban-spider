@@ -3,6 +3,7 @@ const download = require('download')
 const Promise = require('promise')
 const rp = require('request-promise')
 const { config } = require('./modules/config')
+const { processResponse } = require('./modules/processResponse')
 
 const { requestPromiseOptions, crawlPicCount, distFolderName } = config
 
@@ -11,24 +12,6 @@ const { requestPromiseOptions, crawlPicCount, distFolderName } = config
     首次请求用 http://huaban.com/favorite/beauty/
     之后使用 http://huaban.com/favorite/beauty/?max=${下个队列的首个pin_id}&wfl=1&limit=${一次要抓取的数量}
 */
-
-const sliceString = (string, charHead, charTail) => 
-    string.slice(
-        string.indexOf(charHead) + charHead.length || 0
-        , string.indexOf(charTail) || string.length - 1
-    )
-
-const getPicIdQueueInfo = responseJSON => {
-    return {
-        firstId: responseJSON[0].pin_id,
-        lastId: responseJSON[responseJSON.length - 1].pin_id,
-        count: responseJSON.length,
-        picUrls: responseJSON
-            .map(picInfo => `http://img.hb.aicdn.com/${picInfo.file.key}_/fw/480`),
-        filenames: responseJSON
-            .map(picInfo => `${picInfo.file.key}.jpg`)
-    }
-}
 
 const pathAccessible = path => {
     let accessible = false
@@ -65,9 +48,7 @@ function downloadFile (urlQueue, distPath, filenameQueue) {
 rp(requestPromiseOptions)
     .then($ => {
         //process html to picUrls
-        let { data } = $('script').contents()[7]
-        let responseJSON = JSON.parse(sliceString(data, 'app.page["pins"] = ', ';\napp.page["ads"]'))
-        let { firstId, lastId, count, picUrls, filenames } = getPicIdQueueInfo(responseJSON)
+        let { firstId, lastId, count, picUrls, filenames } = processResponse($('script').contents()[7])
         checkPathPermissions(distFolderName)
         downloadFile(picUrls, distFolderName, filenames)
     })
