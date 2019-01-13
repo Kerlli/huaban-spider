@@ -1,9 +1,8 @@
-#### A Spider of fetching images from huaban.com with Node.js
+#### Crawl images from huaban.com
 
 ##### Screenshot:
 
 ![image](https://raw.githubusercontent.com/Kerlli/huaban-spider/master/Screenshot/1.png)
-
 ##### How to run this project:
 
 ```shell
