@@ -2,21 +2,15 @@ const fs = require('fs')
 const download = require('download')
 const Promise = require('promise')
 const rp = require('request-promise')
-const cheerio = require('cheerio')
-const crawlPicCount = 5
+const { config } = require('./modules/config')
 
-const requestUrl = 'http://huaban.com/favorite/beauty/'
+const { requestPromiseOptions, crawlPicCount, distFolderName } = config
+
+// const requestUrl = 'http://huaban.com/favorite/beauty/'
 /*
     首次请求用 http://huaban.com/favorite/beauty/
     之后使用 http://huaban.com/favorite/beauty/?max=${下个队列的首个pin_id}&wfl=1&limit=${一次要抓取的数量}
 */
-
-const options = {
-    uri: `http://huaban.com/favorite/beauty/`,
-    transform: function (body) {
-        return cheerio.load(body)
-    }
-}
 
 const sliceString = (string, charHead, charTail) => 
     string.slice(
@@ -68,14 +62,14 @@ function downloadFile (urlQueue, distPath, filenameQueue) {
     })
 }
 
-rp(options)
+rp(requestPromiseOptions)
     .then($ => {
         //process html to picUrls
         let { data } = $('script').contents()[7]
         let responseJSON = JSON.parse(sliceString(data, 'app.page["pins"] = ', ';\napp.page["ads"]'))
         let { firstId, lastId, count, picUrls, filenames } = getPicIdQueueInfo(responseJSON)
-        checkPathPermissions('./image')
-        downloadFile(picUrls, './image', filenames)
+        checkPathPermissions(distFolderName)
+        downloadFile(picUrls, distFolderName, filenames)
     })
     .catch(err => {
         //Crawling failed or Cheerio choked
