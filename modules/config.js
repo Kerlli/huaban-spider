@@ -7,7 +7,7 @@ const config = {
         return cheerio.load(body)
     }
   },
-  'crawlPicCount': 5,
+  'crawlPicCount': 20,
   'distFolderName': 'downloads'
 }
 
