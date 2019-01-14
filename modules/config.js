@@ -8,7 +8,7 @@ const config = {
     }
   },
   'crawlPicCount': 5,
-  'distFolderName': 'image'
+  'distFolderName': 'downloads'
 }
 
 module.exports = { config }
