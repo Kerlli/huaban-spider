@@ -3,6 +3,7 @@ const { config } = require('./modules/config')
 const { checkAndMkdirIfNeeded } = require('./modules/checkAndMkdirIfNeeded')
 const { processResponse } = require('./modules/processResponse')
 const { downloadFile } = require('./modules/downloadFile')
+const { watchThenPutInQueue } = require('./modules/watchThenPutInQueue')
 
 const { requestPromiseOptions, crawlPicCount, distFolderName } = config
 
