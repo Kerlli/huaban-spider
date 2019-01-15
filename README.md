@@ -12,6 +12,7 @@
   $ npm start
 ```
 
-###### ToDo:
+###### ToDo List📌:
 
-* 翻页爬取
+  * Download over 20 pictures feature
+  
