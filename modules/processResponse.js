@@ -10,4 +10,4 @@ const processResponse = responseJSON => {
   }
 }
 
-module.exports = { getPicIdQueueInfo, processResponse }
+module.exports = { processResponse }
