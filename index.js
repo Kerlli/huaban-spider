@@ -3,7 +3,7 @@ const { config } = require('./modules/config')
 const { checkAndMkdirIfNeeded } = require('./modules/checkAndMkdirIfNeeded')
 const { processResponse } = require('./modules/processResponse')
 const { downloadFile } = require('./modules/downloadFile')
-const { watchThenPutInQueue } = require('./modules/watchThenPutInQueue')
+const { watchAndDownload } = require('./modules/watchThenPutInDownloadQueue')
 
 const { requestPromiseOptions, crawlPicCount, distFolderName } = config
 
@@ -17,8 +17,9 @@ rp(requestPromiseOptions)
     .then($ => {
         //process html to picUrls
         let { firstId, lastId, count, picUrls, filenames } = processResponse($('script').contents()[7])
-        checkAndMkdirIfNeeded(distFolderName)
-        downloadFile(picUrls, crawlPicCount, distFolderName, filenames)
+        // checkAndMkdirIfNeeded(distFolderName)
+        // downloadFile(picUrls, crawlPicCount, distFolderName, filenames)
+        watchAndDownload(lastId)
     })
     .catch(err => {
         //Crawling failed or Cheerio choked
