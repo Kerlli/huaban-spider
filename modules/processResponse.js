@@ -1,5 +1,3 @@
-const { sliceString } = require('./sliceString')
-
 const processResponse = responseJSON => {
   return {
       firstId: responseJSON[0].pin_id,

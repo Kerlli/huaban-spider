@@ -1,5 +1,5 @@
 const get = require('simple-get')
-const { config } = require('./modules/config')
+const { config } = require('./config/config')
 const { checkAndMkdirIfNeeded } = require('./modules/checkAndMkdirIfNeeded')
 const { processResponse } = require('./modules/processResponse')
 const { downloadFile } = require('./modules/downloadFile')
