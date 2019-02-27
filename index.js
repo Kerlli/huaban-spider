@@ -12,5 +12,6 @@ get.concat(requestOptions, (err, res, data) => {
     let { firstId, lastId, count, picUrls, filenames } = processResponse(data.pins)
     checkAndMkdirIfNeeded(distFolderName)
     downloadFile(picUrls, crawlPicCount, distFolderName, filenames)
+    console.log('Watching for new pics per 2 minutes.')
     watchThenDownload(firstId)
   })
